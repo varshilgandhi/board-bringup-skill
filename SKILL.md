@@ -17,6 +17,10 @@ python3 scripts/bringup.py                 # UART, then I2C, sensors + radio if 
 python3 scripts/bringup.py --interactive   # also SPI display (person looks) and buttons (person presses)
 ```
 
+Run it as one plain command with the script's absolute path (this skill's base directory +
+`/scripts/bringup.py`): no `cd`, no pipes, no `tail`. Users often allow only `Bash(python3:*)`, and a
+compound command needs a fresh approval. The output is already short.
+
 It never writes to flash. Without MicroPython on the board it stops after UART and says why. The
 board profile is matched by chip type, or pass `--board boards/<board>.json`.
 
