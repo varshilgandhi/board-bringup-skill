@@ -1,0 +1,80 @@
+{
+  "name": "Waveshare ESP32-C6 Touch LCD 1.83",
+  "chip": "ESP32-C6",
+  "micropython": "ESP32_GENERIC_C6",
+  "source": "pins from xiaozhi-esp32 main/boards/waveshare/esp32-c6-touch-lcd-1.83/config.h",
+  "i2c": [
+    {
+      "bus": "internal",
+      "sda": 7,
+      "scl": 8,
+      "expected": {
+        "0x15": "CST816 touch controller",
+        "0x18": "ES8311 audio codec",
+        "0x34": "AXP2101 power management",
+        "0x40": "ES7210 microphone ADC",
+        "0x51": "PCF85063 real-time clock",
+        "0x6b": "QMI8658 6-axis IMU"
+      },
+      "who_am_i": {
+        "0x34": {
+          "reg": "0x03",
+          "value": "0x4a"
+        },
+        "0x6b": {
+          "reg": "0x00",
+          "value": "0x05"
+        }
+      },
+      "verified": "2026-10-19 scan on the real board: all 6 answered, who_am_i matched"
+    }
+  ],
+  "do_not_drive": [
+    0,
+    19,
+    20,
+    21,
+    22,
+    23
+  ],
+  "spi_display": {
+    "driver": "ST7789",
+    "sck": 1,
+    "mosi": 2,
+    "cs": 5,
+    "dc": 3,
+    "rst": 4,
+    "backlight": 6,
+    "width": 240,
+    "height": 284,
+    "offset_x": 0,
+    "offset_y": 0,
+    "invert": true,
+    "freq_hz": 24000000,
+    "miso": null,
+    "verified": "2026-10-19: red/green/blue bands confirmed by eye, 136320 bytes in 61 ms at 20 MHz"
+  },
+  "buttons": {
+    "BOOT": 9,
+    "PWR": 18
+  },
+  "notes": [
+    "PWR is also the AXP2101 power key: a long press (4 s) can switch the board off. Short presses only."
+  ],
+  "buttons_verified": "2026-10-19: BOOT idles high (active-low), PWR idles low (active-high); one press each seen",
+  "sensors": {
+    "pmic": {
+      "type": "axp2101",
+      "addr": "0x34"
+    },
+    "imu": {
+      "type": "qmi8658",
+      "addr": "0x6b"
+    },
+    "rtc": {
+      "type": "pcf85063",
+      "addr": "0x51"
+    }
+  },
+  "sensors_verified": "2026-10-19: USB 5.15 V, no battery; gravity 1.03 g; RTC ticking, stop flag set (no backup battery)"
+}
