@@ -151,7 +151,9 @@ CHARGE_STATE = {0: "trickle charging", 1: "pre-charging", 2: "charging (constant
 # Each sensor type: plan entries for the board, and a decoder that turns raw bytes into a result line.
 def plan_axp2101(addr):
     # 0x30: ADC channel enable (bit0 VBAT, bit2 VBUS). 0x00/0x01 status, 0x34/0x38 ADC, 0xA4 fuel gauge.
-    return [["pmic", addr, [[0x30, 0x05, "or"]], [[0x00, 1], [0x01, 1], [0x34, 2], [0x38, 2], [0xA4, 1]], 50]]
+    # After a full power-off the ADC starts disabled and its registers read 0 until the first conversion,
+    # so give it time (50 ms was not enough on the C6 board after a cold start).
+    return [["pmic", addr, [[0x30, 0x05, "or"]], [[0x00, 1], [0x01, 1], [0x34, 2], [0x38, 2], [0xA4, 1]], 600]]
 
 
 def decode_axp2101(raw):
@@ -161,7 +163,8 @@ def decode_axp2101(raw):
     vbus_mv = (vbus[0] & 0x3F) << 8 | vbus[1]
     usb = bool(st1 & 0x20)
     bat = bool(st1 & 0x08)
-    parts = [f"USB power {'present' if usb else 'NOT present'} ({vbus_mv / 1000:.2f} V)"]
+    vbus_txt = f"{vbus_mv / 1000:.2f} V" if vbus_mv else "no voltage reading yet"
+    parts = [f"USB power {'present' if usb else 'NOT present'} ({vbus_txt})"]
     if bat:
         parts.append(f"battery {vbat_mv / 1000:.2f} V, {pct}%, {CHARGE_STATE.get(st2 & 0x07, 'unknown state')}")
     else:
@@ -170,7 +173,7 @@ def decode_axp2101(raw):
     fix = None
     if not usb:
         status, fix = "warn", "the board is running but the power chip does not see USB power - check VBUS wiring"
-    elif not 4400 <= vbus_mv <= 5500:
+    elif vbus_mv and not 4400 <= vbus_mv <= 5500:
         status, fix = "warn", f"USB voltage {vbus_mv / 1000:.2f} V is outside 4.4-5.5 V - weak port, long cable or hub"
     return status, "power: " + ", ".join(parts), fix
 

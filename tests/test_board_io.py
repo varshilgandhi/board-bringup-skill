@@ -85,6 +85,14 @@ class Sensors(unittest.TestCase):
         self.assertIn("no battery", line)
         self.assertIn("4.20 V", fix)
 
+    def test_axp2101_zero_reading_is_not_a_weak_supply(self):
+        # Seen on the board after a cold start: status says USB present, ADC register still 0.
+        raw = {"pmic": [[0x20], [0x05], [0x00, 0x00], [0x00, 0x00], [0]]}
+        status, line, fix = b.decode_axp2101(raw)
+        self.assertEqual(status, "ok")
+        self.assertIn("no voltage reading yet", line)
+        self.assertIsNone(fix)
+
     def test_qmi8658_flat(self):
         raw = {"imu": [[0, 0, 0, 0, 0x00, 0x40]]}                            # z = +16384 = +1 g
         status, line, _ = b.decode_qmi8658(raw)
