@@ -22,6 +22,13 @@ Everything below is open. Pick one, open an issue saying you're on it, and send 
 - **Audio** (ES8311 / ES7210): play a tone, record a second, check the level.
 - **Generic GPIO check** for boards without a profile: which pins are free, which are strapping pins.
 
+## Other microcontroller families
+
+- **STM32, RP2040, nRF52 and others.** The USB, driver, port, permission and busy checks are not
+  ESP32-specific; the boot log reading, chip id (esptool) and MicroPython board side are. Each family
+  needs its own chip id tool (e.g. `openocd`/`probe-rs`, `picotool`) and known USB IDs, then the same
+  plain-words report.
+
 ## Making it easier to start
 
 - **More board profiles** in `boards/` - pins, expected I2C devices, ID registers. One JSON per board,
